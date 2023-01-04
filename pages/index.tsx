@@ -1,30 +1,21 @@
-import Head from 'next/head';
-import Link from 'next/link';
-import { useState } from 'react';
 import AddLinkForm from '../components/AddLinkForm';
-import styles from '../styles/Home.module.css';
+import { useState } from 'react';
 
 export default function Home() {
   const [linkId, setLinkId] = useState<string | null>(null);
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>URL Shortner</title>
-        <meta name='description' content='url-shortner' />
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
-
-      <main className={styles.main}>
-        <h1>URL Shortner</h1>
+    <main>
+      <div className='h-screen flex justify-center items-center flex-col'>
+        <h1 className='mb-32 text-4xl'>Shortened Url</h1>
         <AddLinkForm setLinkId={setLinkId} />
-        {linkId && (
-          <div>
-            <Link
-              href={`http://localhost:3000/${linkId}`}
-            >{`http://localhost:3000/${linkId}`}</Link>
+        {linkId ? (
+          <div className='absolute mt-24'>
+            <a
+              href={`/${linkId}`}
+            >{`https://url-shortner.shivanshu.in/${linkId}`}</a>
           </div>
-        )}
-      </main>
-    </div>
+        ) : null}
+      </div>
+    </main>
   );
 }
