@@ -18,6 +18,14 @@ const Home: NextPage = () => {
   const [error, setError] = useState<string | null | undefined>(null);
   const [url, setUrl] = useState<string>("");
 
+  const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_URL)
+      return `https://${process.env.NEXT_PUBLIC_URL}/`;
+    else if (process.env.NEXT_PUBLIC_VERCEL_URL)
+      return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/`;
+    else return `http://localhost:${process.env.PORT ?? 3000}/`;
+  };
+
   const input = useRef<HTMLInputElement>(null);
   const customName = useRef<HTMLInputElement>(null);
   const urlPattern =
@@ -61,12 +69,6 @@ const Home: NextPage = () => {
     setCustomLink(mutation.data?.customName);
   };
 
-  // unable to use window.location.href directly because of SSR
-  useEffect(() => {
-    const url = window.location.href;
-    setUrl(url);
-  }, [url]);
-
   return (
     <>
       <Head>
@@ -105,12 +107,12 @@ const Home: NextPage = () => {
           )}
           {!error && linkId && (
             <Link href={`/${linkId}`} className="text-blue-500">
-              {`${url}${linkId}`}
+              {`${getBaseUrl()}${linkId}`}
             </Link>
           )}
           {!error && customLink && (
             <Link href={`/${customLink}`} className="text-blue-500">
-              {`${url}${customLink}`}
+              {`${getBaseUrl()}${customLink}`}
             </Link>
           )}
         </div>
