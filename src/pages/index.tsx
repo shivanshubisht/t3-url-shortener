@@ -2,7 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { Inter } from "next/font/google";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { api } from "../utils/api";
 
@@ -16,7 +16,6 @@ const Home: NextPage = () => {
   const [customLink, setCustomLink] = useState<string | null | undefined>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null | undefined>(null);
-  const [url, setUrl] = useState<string>("");
 
   const getBaseUrl = () => {
     if (process.env.NEXT_PUBLIC_URL)
@@ -33,7 +32,7 @@ const Home: NextPage = () => {
 
   const mutation = api.url.shorten.useMutation();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setLinkId("");
@@ -56,17 +55,25 @@ const Home: NextPage = () => {
     }
 
     // mutation.mutate({ link: url, customName: customName.current!.value });
-    mutation.mutate({
+    const response = await mutation.mutateAsync({
       link: url,
       customName:
         customName.current?.value === "" ? null : customName.current?.value,
     });
+    console.log(response);
+
+    if (mutation.isLoading) {
+      setLoading(true);
+      return;
+    }
+
     setLoading(false);
-    setLinkId(mutation.data?.link);
-    // setLinkId(mutation.data?.response.link);
-    // setError(mutation.error?.message);
-    setError(mutation.data?.error);
-    setCustomLink(mutation.data?.customName);
+    // setLinkId(mutation.data?.link);
+    setLinkId(response.link);
+    // setError(mutation.data?.error);
+    setError(response.error);
+    // setCustomLink(mutation.data?.customName);
+    setCustomLink(response.customName);
   };
 
   return (

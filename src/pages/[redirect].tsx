@@ -1,14 +1,20 @@
 import { prisma } from "../server/db";
+import ErrorPage from "next/error";
+import type { GetServerSideProps } from "next";
 
-interface Params {
-  linkId: string;
-}
-
-export const getServerSideProps = async ({ params }: { params: Params }) => {
+export const getServerSideProps = async (context: GetServerSideProps) => {
+  const {params, res} = context;
   try {
     const url = await prisma.link.findFirst({
       where: {
-        linkId: params.linkId,
+        OR: [
+          {
+            customname: params.redirect,
+          },
+          {
+            linkId: params.redirect,
+          },
+        ],
       },
     });
     if (url) {
@@ -18,26 +24,17 @@ export const getServerSideProps = async ({ params }: { params: Params }) => {
         },
       };
     }
-
     if (!url) {
-      return {
-        redirect: {
-          destination: "http://localhost:3000",
-        },
-      };
+      res.statusCode = 404;
+      return { props: { url: null } };
     }
-  } catch (err) {
-    console.log(err);
-    return {
-      redirect: {
-        destination: "http://localhost:3000",
-      },
-    };
+  } catch (error) {
+    console.error();
   }
 };
 
 const Link = () => {
-  return <></>;
+  return <ErrorPage statusCode={404} />;
 };
 
 export default Link;
