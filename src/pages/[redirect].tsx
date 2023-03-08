@@ -1,9 +1,16 @@
 import { prisma } from "../server/db";
 import ErrorPage from "next/error";
-import type { GetServerSideProps } from "next";
 
-export const getServerSideProps = async (context: GetServerSideProps) => {
-  const {params, res} = context;
+type ContextType = {
+  params: {
+    redirect: string;
+  };
+  res: {
+    statusCode: number;
+  };
+};
+
+export const getServerSideProps = async ({ params, res }: ContextType) => {
   try {
     const url = await prisma.link.findFirst({
       where: {
